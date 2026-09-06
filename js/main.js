@@ -226,3 +226,43 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 });
+
+/* ---- Kontaktformular: sendet still an Formspree ---- */
+document.addEventListener('DOMContentLoaded', function () {
+  var form = document.getElementById('contact-form');
+  if (!form) return;
+
+  var submitBtn = document.getElementById('cf-submit');
+  var submitLabel = document.getElementById('cf-submit-label');
+  var errorNote = document.getElementById('cf-error');
+  var successBox = document.getElementById('contact-success');
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    if (errorNote) errorNote.classList.add('hidden');
+    if (submitBtn) submitBtn.disabled = true;
+    if (submitLabel) submitLabel.textContent = 'Wird gesendet …';
+
+    var data = new FormData(form);
+
+    fetch(form.action, {
+      method: 'POST',
+      body: data,
+      headers: { 'Accept': 'application/json' }
+    })
+      .then(function (response) {
+        if (response.ok) {
+          form.classList.add('hidden');
+          if (successBox) successBox.classList.remove('hidden');
+        } else {
+          throw new Error('Formspree-Fehler');
+        }
+      })
+      .catch(function () {
+        if (errorNote) errorNote.classList.remove('hidden');
+        if (submitBtn) submitBtn.disabled = false;
+        if (submitLabel) submitLabel.textContent = 'Nachricht senden ↗';
+      });
+  });
+});
